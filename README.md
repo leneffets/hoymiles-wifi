@@ -51,3 +51,6 @@ dtu_power: 741
 dtu_daily_energy: 85
 ```
 
+```
+python main.py
+```
