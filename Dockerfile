@@ -4,6 +4,7 @@ FROM python:3.12
 WORKDIR /workspace
 
 ENV PYTHONWARNINGS="ignore"
+ENV IPADDRESS="192.168.1.184"
 
 # Install any dependencies
 COPY requirements.txt ./
@@ -13,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set the default command to bash
-CMD ["bash"]
+CMD ["python3", "main.py"]

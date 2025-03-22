@@ -1,15 +1,13 @@
 import asyncio
-import logging
+import os
+from datetime import datetime
 from hoymiles_wifi.dtu import DTU
 
-# Configure logging with local timestamp
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
-
 async def main():
-    dtu = DTU('192.168.1.184')
+    dtu = DTU(os.getenv('IPADDR', '192.168.1.184'))
     while True:
         response = await dtu.async_get_real_data_new()
-        logging.debug(f"response: {response}")
+        # print(f"{datetime.now()}: response: {response}")
 
         if response:
             if response.sgs_data:
@@ -19,19 +17,11 @@ async def main():
                 active_power = sgs_data.active_power  # Active power in watts
                 apparent_power = voltage * current  # Apparent power in VA
                 power_factor = active_power / apparent_power if apparent_power != 0 else 0
-                logging.info(f"Power Factor: {power_factor:.2f}")
-
-            # dtu_power = response.dtu_power
-            # dtu_power_str = f"{dtu_power // 10}.{dtu_power % 10}"
-            # logging.info(f"dtu_power: {dtu_power_str}W")
+                # print(f"{datetime.now()} - INFO: Power Factor: {power_factor:.2f}")
 
             dtu_power = response.dtu_power
-            logging.info(f"dtu_power: {dtu_power/10}W")
-
-            # Split dtu_daily_energy
             dtu_daily_energy = response.dtu_daily_energy
-            #dtu_daily_energy_str = f"{dtu_daily_energy // 10}.{dtu_daily_energy % 10}"
-            logging.info(f"dtu_daily_energy: {dtu_daily_energy}Wh")
+            print(f"{datetime.now()} - INFO: dtu_power: {dtu_power/10:4.1f} W | dtu_daily_energy: {dtu_daily_energy:4d} Wh")
 
         await asyncio.sleep(60)
 
