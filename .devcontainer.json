@@ -11,8 +11,9 @@
         "ms-python.vscode-pylance"
     ],
     "postCreateCommand": "pip install -r requirements.txt",
+    "initializeCommand": "mkdir -p data",
     "runArgs": [
         "--network", "host",
-        "--mount", "type=bind,source=${localWorkspaceFolder}/data,target=/workspace/data,consistency=cached" // Updated to use --mount
-    ],
+        "--mount", "type=bind,source=${localWorkspaceFolder}/data,target=/workspace/data,consistency=cached" // Adjusted mount syntax
+    ]
 }
