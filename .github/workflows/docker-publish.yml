@@ -31,4 +31,4 @@ jobs:
       # Push the Docker image to GitHub Packages
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:latest
