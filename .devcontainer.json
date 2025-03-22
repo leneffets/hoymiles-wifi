@@ -13,6 +13,6 @@
     "postCreateCommand": "pip install -r requirements.txt",
     "runArgs": [
         "--network", "host",
-        "-v", "${localWorkspaceFolder}/data:/workspace/data"  // Mount the data directory
-    ]
+        "--mount", "type=bind,source=${localWorkspaceFolder}/data,target=/workspace/data,consistency=cached" // Updated to use --mount
+    ],
 }
