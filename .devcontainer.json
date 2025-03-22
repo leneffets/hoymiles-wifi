@@ -11,5 +11,8 @@
         "ms-python.vscode-pylance"
     ],
     "postCreateCommand": "pip install -r requirements.txt",
-    "runArgs": ["--network", "host"]
+    "runArgs": [
+        "--network", "host",
+        "-v", "${localWorkspaceFolder}/data:/workspace/data"  // Mount the data directory
+    ]
 }

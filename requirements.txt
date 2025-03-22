@@ -1,2 +1,3 @@
 # https://github.com/suaveolent/hoymiles-wifi
 hoymiles-wifi==0.4.0
+rrdtool
