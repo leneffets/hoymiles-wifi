@@ -8,7 +8,7 @@ ENV IPADDRESS="192.168.1.184"
 
 # Install any dependencies
 COPY requirements.txt ./
-RUN apt install librrd-dev
+RUN apt install librrd-dev \
     && pip install --no-cache-dir -r requirements.txt
 
 # Create a directory for persistent data
