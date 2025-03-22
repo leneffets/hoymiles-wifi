@@ -10,6 +10,10 @@
         "ms-python.python",
         "ms-python.vscode-pylance"
     ],
-    "postCreateCommand": "pip install -r requirements.txt",
-    "runArgs": ["--network", "host"]
+    "postCreateCommand": "pip install -r requirements.txt && apt install -y rrdtool",
+    "initializeCommand": "mkdir -p data",
+    "runArgs": [
+        "--network", "host",
+        "--mount", "type=bind,source=${localWorkspaceFolder}/data,target=/workspace/data,consistency=cached" // Adjusted mount syntax
+    ]
 }

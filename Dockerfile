@@ -4,11 +4,17 @@ FROM python:3.12
 WORKDIR /workspace
 
 ENV PYTHONWARNINGS="ignore"
-ENV IPADDRESS="192.168.1.184"
+ENV IPADDRESS="192.168.1.183"
+ENV TZ="Europe/Berlin"
 
 # Install any dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt update \
+    && apt install -y librrd-dev \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Create a directory for persistent data
+RUN mkdir -p /workspace/data
 
 # Copy the rest of the application code
 COPY . .
