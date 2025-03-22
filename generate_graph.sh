@@ -39,7 +39,7 @@ rrdtool graph "$OUTPUT_IMAGE" \
 # Generate the graph for dtu_power for the last 3 hours
 OUTPUT_IMAGE_3HRS="/workspace/data/dtu_power_3hrs.png"
 rrdtool graph "$OUTPUT_IMAGE_3HRS" \
-    --start "00:00" \
+    --start "-3h" \
     --end "$END_TIME" \
     --title "DTU Power (Last 3 Hours)" \
     --vertical-label "Power (W)" \
@@ -50,7 +50,7 @@ rrdtool graph "$OUTPUT_IMAGE_3HRS" \
 # Generate the graph for dtu_power for today
 OUTPUT_IMAGE_TODAY="/workspace/data/dtu_power_today.png"
 rrdtool graph "$OUTPUT_IMAGE_TODAY" \
-    --start "00:00" \
+    --start "06:00" \
     --end "$END_TIME" \
     --title "DTU Power (Today)" \
     --vertical-label "Power (W)" \
