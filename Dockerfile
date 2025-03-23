@@ -5,6 +5,7 @@ WORKDIR /workspace
 
 ENV PYTHONWARNINGS="ignore"
 ENV IPADDRESS="192.168.1.184"
+ENV TZ="Europe/Berlin"
 
 # Install any dependencies
 COPY requirements.txt ./
