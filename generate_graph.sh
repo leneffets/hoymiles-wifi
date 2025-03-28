@@ -2,16 +2,16 @@
 
 # Variables
 RRD_FILE="/workspace/data/data.rrd"  # Path to the RRD file
-OUTPUT_IMAGE="/workspace/data/graph.png"  # Output image file
+OUTPUT_IMAGE="/workspace/data/$(date +'%Y-%m-%d')"  # Output image file
 START_TIME="-1d"  # Start time (e.g., last day)
 END_TIME="now"  # End time
 TITLE="Hoymiles Data Graph"
 VERTICAL_LABEL="Values"
-WIDTH=600  # Image width
+WIDTH=680  # Image width
 HEIGHT=400  # Image height
 
 # Generate the graph for all data
-rrdtool graph "$OUTPUT_IMAGE" \
+rrdtool graph "$OUTPUT_IMAGE-full.png" \
     --start "$START_TIME" \
     --end "$END_TIME" \
     --title "$TITLE" \
@@ -41,7 +41,7 @@ rrdtool graph "$OUTPUT_IMAGE" \
     GPRINT:dtu_daily_energy:LAST:"%20.2lf Wh\\n"
 
 # Generate the graph for dtu_power for the last 3 hours
-OUTPUT_IMAGE_3HRS="/workspace/data/dtu_power_3hrs.png"
+OUTPUT_IMAGE_3HRS="$OUTPUT_IMAGE-dtu_power_3hrs.png"
 rrdtool graph "$OUTPUT_IMAGE_3HRS" \
     --start "-3h" \
     --end "$END_TIME" \
@@ -54,7 +54,7 @@ rrdtool graph "$OUTPUT_IMAGE_3HRS" \
     GPRINT:dtu_power:LAST:"%20.2lf W\\n"
 
 # Generate the graph for dtu_power for the last 30 mins
-OUTPUT_IMAGE_30MINS="/workspace/data/dtu_power_30mins.png"
+OUTPUT_IMAGE_30MINS="$OUTPUT_IMAGE-dtu_power_30mins.png"
 rrdtool graph "$OUTPUT_IMAGE_30MINS" \
     --start "-30min" \
     --end "$END_TIME" \
@@ -67,7 +67,7 @@ rrdtool graph "$OUTPUT_IMAGE_30MINS" \
     GPRINT:dtu_power:LAST:"%20.2lf W\\n"
 
 # Generate the graph for dtu_power for today
-OUTPUT_IMAGE_TODAY="/workspace/data/dtu_power_today.png"
+OUTPUT_IMAGE_TODAY="$OUTPUT_IMAGE-dtu_power_today.png"
 rrdtool graph "$OUTPUT_IMAGE_TODAY" \
     --start "06:00" \
     --end "$END_TIME" \
@@ -76,5 +76,8 @@ rrdtool graph "$OUTPUT_IMAGE_TODAY" \
     --width "$WIDTH" \
     --height "$HEIGHT" \
     DEF:dtu_power="$RRD_FILE":dtu_power:AVERAGE \
-    LINE2:dtu_power#00FFFF:"DTU Power (W)" \
-    GPRINT:dtu_power:LAST:"%20.2lf W\\n"
+    DEF:dtu_daily_energy="$RRD_FILE":dtu_daily_energy:MAX \
+    AREA:dtu_power#002FAA:"DTU Power (W)" \
+    LINE2:dtu_daily_energy#67F200:"Total (Wh)" \
+    GPRINT:dtu_power:LAST:"%20.2lf W\\n" \
+    GPRINT:dtu_daily_energy:LAST:"Total\: %4.0lf Wh\\n"
