@@ -4,7 +4,7 @@ FROM python:3.12
 WORKDIR /workspace
 
 ENV PYTHONWARNINGS="ignore"
-ENV IPADDRESS="192.168.1.184"
+ENV IPADDR="192.168.1.184"
 ENV TZ="Europe/Berlin"
 
 # Install any dependencies
