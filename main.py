@@ -48,7 +48,7 @@ async def fetch_and_fill_history(dtu):
         timestamp = start_time + (i * step_time)
 
         try:
-            print(f"{timestamp}:U:U:U:U:U:{power/10}:U")
+            print(f"{datetime.fromtimestamp(timestamp)} - {timestamp}:U:U:U:U:U:{power/10}:U")
             rrdtool.update(
                 RRD_FILE,
                 f"{timestamp}:U:U:U:U:U:{power/10}:U"  # Only power is available, others are unknown
@@ -63,12 +63,9 @@ async def main():
     create_rrd()  # Ensure the RRD database is created
     print(f"{datetime.now()} - INFO: Starting data collection...")
     print(f"{datetime.now()} - INFO: RRD database: {RRD_FILE}")
-    print(f"{datetime.now()} - INFO: Connecting to DTU...{os.getenv('IPADDR', '192.168.1.184')}")
-    dtu = DTU(os.getenv('IPADDR', '192.168.1.184'))
-
-    # Fetch and fill historical data if needed
+    print(f"{datetime.now()} - INFO: connecting to DTU...{os.getenv('IPADDR', '')}")
+    dtu = DTU(os.getenv('IPADDR', '192.168.1.183'))
     await fetch_and_fill_history(dtu)
-
     while True:
         response = await dtu.async_get_real_data_new()
         # print(f"{datetime.now()}: response: {response}")
