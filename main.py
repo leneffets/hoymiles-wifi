@@ -35,17 +35,104 @@ def update_rrd(voltage, current, active_power, apparent_power, power_factor, dtu
         f"{current_time}:{voltage}:{current}:{active_power}:{apparent_power}:{power_factor}:{dtu_power}:{dtu_daily_energy}"
     )
 
+def generate_graphs():
+    """Generate RRD graphs similar to generate_graph.sh."""
+    now = datetime.now()
+    output_image_base = f"/workspace/data/{now.strftime('%Y-%m-%d')}"
+    end_time = "now"
+    width = "680"
+    height = "400"
+
+    # 1. Full graph (all data)
+    rrdtool.graph(
+        f"{output_image_base}-full.png",
+        "--start", "00:00",
+        "--end", end_time,
+        "--title", f"Hoymiles Data Graph ({now.strftime('%Y-%m-%d')})",
+        "--vertical-label", "Values",
+        "--width", width,
+        "--height", height,
+        f"DEF:voltage={RRD_FILE}:voltage:AVERAGE",
+        f"DEF:current={RRD_FILE}:current:AVERAGE",
+        f"DEF:active_power={RRD_FILE}:active_power:AVERAGE",
+        f"DEF:apparent_power={RRD_FILE}:apparent_power:AVERAGE",
+        f"DEF:power_factor={RRD_FILE}:power_factor:AVERAGE",
+        f"DEF:dtu_power={RRD_FILE}:dtu_power:AVERAGE",
+        f"DEF:dtu_daily_energy={RRD_FILE}:dtu_daily_energy:AVERAGE",
+        "LINE1:voltage#FF0000:Voltage (V)",
+        "GPRINT:voltage:LAST:%20.2lf V\\n",
+        "LINE1:current#00FF00:Current (A)",
+        "GPRINT:current:LAST:%20.2lf A\\n",
+        "LINE1:active_power#0000FF:Active Power (W)",
+        "GPRINT:active_power:LAST:%20.2lf W\\n",
+        "LINE1:apparent_power#FFFF00:Apparent Power (VA)",
+        "GPRINT:apparent_power:LAST:%20.2lf VA\\n",
+        "LINE1:power_factor#FF00FF:Power Factor",
+        "GPRINT:power_factor:LAST:%20.2lf\\n",
+        "LINE1:dtu_power#00FFFF:DTU Power (W)",
+        "GPRINT:dtu_power:LAST:%20.2lf W\\n",
+        "LINE1:dtu_daily_energy#FFA500:DTU Daily Energy (Wh)",
+        "GPRINT:dtu_daily_energy:LAST:%20.2lf Wh\\n"
+    )
+
+    # 2. dtu_power last 3 hours
+    rrdtool.graph(
+        f"{output_image_base}-dtu_power_3hrs.png",
+        "--start", "-3h",
+        "--end", end_time,
+        "--title", f"DTU Power ({now.strftime('%Y-%m-%d')} Last 3 Hours)",
+        "--vertical-label", "Power (W)",
+        "--width", width,
+        "--height", height,
+        f"DEF:dtu_power={RRD_FILE}:dtu_power:AVERAGE",
+        "AREA:dtu_power#00222F:DTU Power (W)",
+        "GPRINT:dtu_power:LAST:%20.2lf W\\n"
+    )
+
+    # 3. dtu_power last 30 minutes
+    rrdtool.graph(
+        f"{output_image_base}-dtu_power_30mins.png",
+        "--start", "-30min",
+        "--end", end_time,
+        "--title", f"DTU Power ({now.strftime('%Y-%m-%d')} Last 30 Minutes)",
+        "--vertical-label", "Power (W)",
+        "--width", width,
+        "--height", height,
+        f"DEF:dtu_power={RRD_FILE}:dtu_power:AVERAGE",
+        "LINE2:dtu_power#00FFFF:DTU Power (W)",
+        "GPRINT:dtu_power:LAST:%20.2lf W\\n"
+    )
+
+    # 4. dtu_power today (from 06:00)
+    rrdtool.graph(
+        f"{output_image_base}-dtu_power_today.png",
+        "--start", "06:00",
+        "--end", end_time,
+        "--title", f"DTU Power ({now.strftime('%Y-%m-%d')})",
+        "--vertical-label", "Power (W)",
+        "--width", width,
+        "--height", height,
+        f"DEF:dtu_power={RRD_FILE}:dtu_power:AVERAGE",
+        f"DEF:dtu_daily_energy={RRD_FILE}:dtu_daily_energy:MAX",
+        "AREA:dtu_power#002FAA:DTU Power (W)",
+        "GPRINT:dtu_power:LAST:%20.2lf W\\n",
+        "GPRINT:dtu_daily_energy:LAST:Total\\: %4.0lf Wh\\n"
+    )
+
 async def fetch_and_fill_history(dtu):
     """Fetch historical data and fill the RRD database."""
     print(f"{datetime.now()} - INFO: Fetching historical data...")
 
     history_response = await dtu.async_app_get_hist_power()
-
+    print(f"history_response: {history_response}")
     start_time = history_response.absolute_start
     step_time = history_response.step_time
 
     for i, power in enumerate(history_response.power_array):
-        timestamp = start_time + (i * step_time)
+        # TODO: Fix the timestamp calculation
+        # When returned in combined array, not the first request time is taken
+        # timestamp = start_time + (i * step_time)
+        timestamp = history_response.request_time - (len(history_response.power_array) * step_time) + (i * step_time)
 
         try:
             print(f"{datetime.fromtimestamp(timestamp)} - {timestamp}:U:U:U:U:U:{power/10}:U")
@@ -83,6 +170,9 @@ async def main():
 
                 # Update the RRD database
                 update_rrd(voltage, current, active_power, apparent_power, power_factor, dtu_power, dtu_daily_energy)
+
+                # Generate graphs after updating RRD
+                generate_graphs()
 
                 print(f"{datetime.now()} - INFO: dtu_power: {dtu_power:4.1f} W | dtu_daily_energy: {dtu_daily_energy:4d} Wh")
 
