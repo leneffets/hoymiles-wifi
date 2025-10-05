@@ -1,17 +1,15 @@
-FROM python:3.12
+FROM python:3-slim
 
 # Set the working directory
 WORKDIR /workspace
 
-ENV PYTHONWARNINGS="ignore"
-ENV IPADDRESS="192.168.1.183"
 ENV TZ="Europe/Berlin"
 
 # Install any dependencies
 COPY requirements.txt ./
 RUN apt update \
-    && apt install -y librrd-dev \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a directory for persistent data
 RUN mkdir -p /workspace/data

@@ -1,5 +1,5 @@
 {
-    "name": "Python 3.12 Development Container",
+    "name": "Python Hoymiles Container",
     "build": {
         "dockerfile": "Dockerfile"
     },
@@ -10,7 +10,7 @@
         "ms-python.python",
         "ms-python.vscode-pylance"
     ],
-    "postCreateCommand": "pip install -r requirements.txt && apt install -y rrdtool",
+    "postCreateCommand": "pip install -r requirements.txt",
     "initializeCommand": "mkdir -p data",
     "runArgs": [
         "--network", "host",
